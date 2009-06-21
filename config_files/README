@@ -1,0 +1,10 @@
+dll,lib,header files.
+
+Copy 	dll in windows\system32\
+	lib in your compiler lib dir
+	include in your compiler include dir
+
+for instance, if you use dev-c++
+	dll in c:\windows\system32\
+	lib in c:\dev-cpp\lib\
+	include in c:\dev-cpp\include\
