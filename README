@@ -1,0 +1,31 @@
+Windows:
+	Compile:
+		Install Dev-c++, copy "include" and "lib" from config_files/ in dev c++ folder
+	Run:
+		Go-to bin/
+		Press {WIN} + {R} (open 'run'), type cmd and press enter.
+		Type: 'cd Desktop' and press enter
+		Drag 'youtube_downloader.exe' into cmd and copy a youtube link into it.
+		(for paste, right click -> paste :P)
+		and press enter
+
+		for instance:
+		C:\lol\youtube_downloader.exe http://www.youtube.com/watch?v=G1zkXdqcajk
+		
+		Video is saved into Desktop
+
+Linux
+	Compile:
+		install libcurl4-dev 
+		on debian-based distros, like as ubuntu type:
+			sudo apt-get install libcurl4-dev
+
+		goto into project dir and type
+
+		make && sudo make install
+	Run:
+		type
+		youtube_downloader <here_goes_youtube_link>
+
+		for instance:
+		youtube_downloader http://www.youtube.com/watch?v=G1zkXdqcajk
