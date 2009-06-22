@@ -1,3 +1,5 @@
+This is an open-souce Youtube Downloader written in C++ that allows to download video in Low Quality, High Quality and High Definition(HD 720p).
+
 Windows:
 	Compile:
 		Install Dev-c++, copy "include" and "lib" from config_files/ in dev c++ folder
