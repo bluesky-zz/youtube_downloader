@@ -1,4 +1,3 @@
-
 all:
 	g++ -o main.o -c main.cpp
 	g++ -o utils.o -c utils.cpp
