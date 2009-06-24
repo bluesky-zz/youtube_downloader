@@ -279,7 +279,7 @@ string get_ext_from_format(int fmt)
 			return ".mp4";
 			break;
 	}
-	
+	return 0;
 }
 
 string get_only_file_name(string fullpath)

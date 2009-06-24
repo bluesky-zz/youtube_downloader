@@ -20,7 +20,7 @@
 
 string buffer,token,title,download_dir;
 bool down_in_hq = false, video_ok = false, autoquality = false;
-int format_count, *fmt_map, format_choosed;
+int format_count, format_choosed, *fmt_map;
 
 int get_fmt()
 {

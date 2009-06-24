@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with YouTube Downloader.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #ifndef UTILS_H
 #define UTILS_H
 	#include "common.h"
