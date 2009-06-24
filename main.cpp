@@ -48,7 +48,8 @@ void print_choose()
 	if(format_count > 1)
 	{
 		log(0,"FormatManager","Best format is:");
-		print_format_from_number(best_format);
+		printf("\t%d)",(best_format+1));
+		print_format_from_number(fmt_map[best_format]);
 	}
 
 	if(autoquality || format_count == 1)
@@ -275,7 +276,7 @@ void download_video(string link, string token)
 	if(file_exists(fname.c_str()))
 	{
 		char choose;
-		log(0,"Writer",	"%s already exists. Overwrite? [S\\n] ",get_only_file_name(fname).c_str());
+		log(1,"Writer",	"%s already exists. Overwrite? [S\\n] ",get_only_file_name(fname).c_str());
 		do
 		{
 			scanf("%c",&choose);
@@ -323,20 +324,14 @@ void download_video(string link, string token)
 
 void print_help(string exename)
 {
-		string realname = get_only_file_name(exename);
-		
-		
-		char *usage = (char *) malloc((exename.length() + 300) * sizeof(char));
-		sprintf(usage,	"Usage: \n %s [<options>] <youtube link>\n"
-						"    -a  --auto-quality\t\tDownload at highest quality available\n"
-						"    -d  --download-dir <dir>\tDownload file in this directory\n"
-						"    -h  --help\t\t\tPrint this help\n"
-						"\n"
-		,realname.c_str());	
-
-	printf("%s",usage);
-	system("pause");
-	free(usage);		
+	string realname = get_only_file_name(exename);
+	
+	printf(	"Usage: \n %s [<options>] <youtube link>\n"
+		"    -a  --auto-quality\t\tDownload at highest quality available\n"
+		"    -d  --download-dir <dir>\tDownload file in this directory\n"
+		"    -h  --help\t\t\tPrint this help\n"
+		"\n"
+		,realname.c_str());
 }
 
 int main(int argc, char *argv[])

@@ -18,7 +18,7 @@
 #define COMMON_H
 
 	#include <cstdio>
-	#include <cstdlib>
+	#include <stdlib.h>
 	#include <string>
 	#include <iostream>
 	#include <curl/curl.h>

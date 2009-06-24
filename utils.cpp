@@ -53,7 +53,7 @@ void log(int no_nl, char *name, const char * str, ... )
 
 void bye(int ret)
 {
-    system("pause");
+    //system("pause"); //only for testing
     exit(ret);    
 }
 
@@ -143,7 +143,7 @@ string get_file_name(string download_dir, string video_name, bool append_random)
 	
 	if(append_random)
 	{
-		ltoa(get_ms_time(),rnd,10);
+		//ltoa(get_ms_time(),rnd,10);
 		sprintf(rnd,"%d",get_ms_time());
 		video_name.append(rnd);
 	}
@@ -215,32 +215,32 @@ void print_format_from_number(int fmt)
 	{
 		case 5:
 			printf ("\t[FLV]\t"
-					"Audio: [h263] Low Quality (MONO)\n\t\t"
+					"Audio: [h263] Low Quality (MONO)\n\t\t\t"
 					"Video: [FLV]  Low Quality (320x240)\n\n");
 			break;
 		case 6:
 			printf ("\t[FLV]\t"
-					"Audio: [???] High Quality (MONO)\n\t\t"
+					"Audio: [???] High Quality (MONO)\n\t\t\t"
 					"Video: [FLV] Low Quality  (320x240)\n\n");
 			break;
 		case 18:
 			printf ("\t[MP4]\t"
-					"Audio: [MP4] High Quality (STEREO)\n\t\t"
+					"Audio: [MP4] High Quality (STEREO)\n\t\t\t"
 					"Video: [AVC] Low Quality  (320x240)\n\n");
 			break;
 		case 22:
 			printf ("\t[MP4]\t"
-					"Audio: [MP4] High Quality (STEREO)\n\t\t"
+					"Audio: [MP4] High Quality (STEREO)\n\t\t\t"
 					"Video: [AVC] High Quality (HD 720p)\n\n");
 			break;
 		case 34:
 			printf ("\t[FLV]\t"
-					"Audio: [AAC]  High Quality (STEREO)\n\t\t"
+					"Audio: [AAC]  High Quality (STEREO)\n\t\t\t"
 					"Video: [h264] Low Quality  (320x240)\n\n");
 			break;
 		case 35:
 			printf ("\t[MP4]\t"
-					"Audio: [MP4]  High Quality (STEREO)\n\t\t"
+					"Audio: [MP4]  High Quality (STEREO)\n\t\t\t"
 					"Video: [h264] Low Quality  (320x240)\n\n");
 			break;
 	}	
