@@ -39,7 +39,7 @@ unsigned long get_ms_time()
     return time_in_ms;
 }
 
-void log(int no_nl, const char *name, const char * str, ... )
+void log(int no_nl, char *name, const char * str, ... )
 {
 	va_list ap;
 	char buf[32768];
@@ -53,7 +53,7 @@ void log(int no_nl, const char *name, const char * str, ... )
 
 void bye(int ret)
 {
-    //system("pause");
+    system("pause");
     exit(ret);    
 }
 
@@ -115,21 +115,39 @@ string delete_strange_characters(string data)
 	return trim(ret);
 }
 
-string get_file_name(string video_name)
+string get_file_name(string download_dir, string video_name, bool append_random)
 {
 	string ret;
 	char pos;
 	char strange_char[] = "?\\/*<>\"|:#+%";
 	char rnd[300];
+	
+	if(download_dir.length()>0)
+	{
+		if( (download_dir.rfind("/")==(download_dir.length()-1)) || (download_dir.rfind("\\")==(download_dir.length()-1)) )
+			download_dir = download_dir.substr(0,download_dir.length() - 1);
+		#ifdef WIN32
+			download_dir.append("\\");
+		#else
+			download_dir.append("/");
+		#endif
+		ret = download_dir;
+	}
+	
 	video_name = delete_strange_characters(video_name);
 	if(video_name.length()==0)
 	{
 		video_name = "video";
-		sprintf(rnd,"%d",get_ms_time());
-		video_name.append(rnd);
-		video_name.append(".flv");
+		append_random = true;
 	}
 	
+	if(append_random)
+	{
+		ltoa(get_ms_time(),rnd,10);
+		sprintf(rnd,"%d",get_ms_time());
+		video_name.append(rnd);
+	}
+
 	for(int i=0;i<video_name.length();i++)
 	{
 		
@@ -140,8 +158,9 @@ string get_file_name(string video_name)
 		ret += video_name[i];
 	}
 	
+
 	ret = trim(ret);
-	
+
 	ret.append(get_ext_from_format(get_fmt()));
 	
 	return ret;
@@ -227,6 +246,16 @@ void print_format_from_number(int fmt)
 	}	
 }
 
+int get_best_quality(int *array,int len)
+{
+	int order[] = {22,18,35,34,6,5};
+	for(int i=0;i<sizeof(order);i++)
+		for(int k=0;k<len;k++)
+			if(order[i]==array[k])
+				return k;
+	return 0;
+}
+
 string get_ext_from_format(int fmt)
 {
 	switch(fmt)
@@ -249,5 +278,26 @@ string get_ext_from_format(int fmt)
 		case 35:
 			return ".mp4";
 			break;
-	}	
+	}
+	
+}
+
+string get_only_file_name(string fullpath)
+{
+	#ifdef WIN32
+		int pos = fullpath.rfind("\\");
+	#else
+		int pos = fullpath.rfind("/");
+	#endif
+		return fullpath.substr(++pos);	
+}
+
+bool file_exists(const char *filename)
+{
+	FILE *fp = fopen(filename,"r");
+	
+	if(fp == NULL)
+		return false;
+	
+	return true;	
 }

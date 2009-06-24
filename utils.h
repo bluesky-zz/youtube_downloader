@@ -17,16 +17,19 @@
 #ifndef UTILS_H
 #define UTILS_H
 	#include "common.h"
-	void log(int no_nl, const char *name, const char * str, ... );
+	void log(int no_nl, char *name, const char * str, ... );
 	void bye(int ret);
 	int strpos(char *haystack, char *needle );
 	string url_decode (string url);
 	string delete_strange_characters(string data);
-	string get_file_name(string video_name);
+	string get_file_name(string download_dir, string video_name, bool append_random);
 	string get_video_id(string url);
 	string trim(string str);
 	string clean_string(string str);
 	unsigned long get_ms_time();
 	void print_format_from_number(int fmt);
 	string get_ext_from_format(int fmt);
+	string get_only_file_name(string fullpath);
+	bool file_exists(const char *filename);
+	int get_best_quality(int *array,int len);
 #endif

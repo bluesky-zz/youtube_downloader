@@ -18,10 +18,9 @@
 #include "utils.h"
 
 
-string buffer,token,title;
-bool down_in_hq = false;
-bool video_ok = false;
-int format_count, *fmt_map,format_choosed;
+string buffer,token,title,download_dir;
+bool down_in_hq = false, video_ok = false, autoquality = false;
+int format_count, *fmt_map, format_choosed;
 
 int get_fmt()
 {
@@ -31,7 +30,7 @@ int get_fmt()
 void print_logo()
 {
     printf("*************************************\n");
-    printf("** Youtube Video Downloader v0.01b **\n");
+    printf("** Youtube Video Downloader v0.03a **\n");
     printf("**        Copyleft(C) 2009 r0b0t82 **\n");
     printf("*************************************\n\n");
 }
@@ -45,20 +44,36 @@ void print_choose()
 		print_format_from_number(fmt_map[i]);
 	}
 	
-	bool ok = true;
-	do
+	int best_format = get_best_quality(fmt_map,format_count);	
+	if(format_count > 1)
 	{
-		if(ok == false)
-			log(0, "FormatManager", "Wrong Format!");
+		log(0,"FormatManager","Best format is:");
+		print_format_from_number(best_format);
+	}
+
+	if(autoquality || format_count == 1)
+	{
+		format_choosed = best_format;
+		log(0,"FormatManager","Downloading in");
+		print_format_from_number(fmt_map[format_choosed]);
+	}
+	else
+	{
+		bool ok = true;
+		do
+		{
+			if(ok == false)
+				log(0, "FormatManager", "Wrong Format!");
+				
+			printf("Choose download format: ");
+			scanf("%d",&format_choosed);
+			format_choosed--;
 			
-		printf("Choose download format: ");
-		scanf("%d",&format_choosed);
-		format_choosed--;
-		
-		ok = false;
-		if(format_choosed >=0 && format_choosed < format_count)
-			ok = true;
-	}while(ok == false);
+			ok = false;
+			if(format_choosed >=0 && format_choosed < format_count)
+				ok = true;
+		}while(ok == false);
+	}
 }
 
 void analyze_info(string data)
@@ -184,6 +199,10 @@ string get_info_page(string video_id)
 {
 	CURL *curl;
 	CURLcode result;
+	
+	char *error_buffer = (char *)malloc(CURL_ERROR_SIZE * sizeof(char));
+	memset(error_buffer,0x00,sizeof(error_buffer));
+	
 	curl = curl_easy_init();
 	if(!curl)
 	{
@@ -195,18 +214,26 @@ string get_info_page(string video_id)
 	string pure_link;
     pure_link = "http://www.youtube.com/get_video_info?video_id=";
     pure_link.append(video_id);
-
+	curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, error_buffer);
 	curl_easy_setopt(curl, CURLOPT_URL, pure_link.c_str());
 	curl_easy_setopt(curl, CURLOPT_HEADER, 0);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writer);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+	
 	log(0,"VideoInfo","Getting infos");
 	result = curl_easy_perform(curl);
+	if(strlen(error_buffer)>0)
+	{
+		log(0,"curl","%s",error_buffer);
+		free(error_buffer);
+		bye(8);	
+	}
 	log(0,"VideoInfo","Decoding infos");
 	curl_easy_cleanup(curl);
 	string buf;
 	buf = buffer;
+	free(error_buffer);
 	buffer.clear();
 	return buf;
 }
@@ -224,13 +251,14 @@ void download_video(string link, string token)
 	CURL *curl;
 	CURLcode result;
 	curl = curl_easy_init();
-	char format_video[30];
+	char format_video[30], *error_buffer = (char *)malloc(CURL_ERROR_SIZE * sizeof(char));
+	memset(error_buffer,0x00,sizeof(error_buffer));
 	if(!curl)
 	{
 		log(0,"curl","Starting failed");
 		bye(5);	
 	}
-	string pure_link;
+	string pure_link, fname;
 	pure_link = "http://www.youtube.com/get_video?video_id=";
 	pure_link.append(link);
 	pure_link.append("&t=");
@@ -238,12 +266,36 @@ void download_video(string link, string token)
 	pure_link.append("&fmt=");
 	sprintf(format_video,"%d",get_fmt());
 	pure_link.append(format_video);
+	
+	fname = get_file_name(download_dir, title,false);
+
 	printf("Downloading from %s\n",pure_link.c_str());
-	log(0,"Download","Opening '%s'",get_file_name(title).c_str());
-	FILE *fp = fopen(get_file_name(title).c_str(),"wb");
+	log(0,"Download","Opening '%s'",fname.c_str());
+	
+	if(file_exists(fname.c_str()))
+	{
+		char choose;
+		log(0,"Writer",	"%s already exists. Overwrite? [S\\n] ",get_only_file_name(fname).c_str());
+		do
+		{
+			scanf("%c",&choose);
+		}while(choose != 'n' && choose != 'N' && choose != 's' && choose != 'S');
+		
+		if(choose != 's' && choose != 'S')
+		{
+			log(0,"Writer", "Choosing file name...");
+			do
+			{
+				fname = get_file_name(download_dir,title,true); //random name
+			}while(file_exists(fname.c_str()));
+			log(0,"Writer", "New filename: %s",get_only_file_name(fname).c_str());
+		}
+	}
+	
+	FILE *fp = fopen(fname.c_str(),"wb");
 	if(!fp)
 	{
-		log(0,"Writer","Cannot open %s",get_file_name(title).c_str());
+		log(0,"Writer","Cannot open %s",fname.c_str());
 		bye(6);
 	}
 	log(0,"Download","Configuring curl");
@@ -257,37 +309,102 @@ void download_video(string link, string token)
 	curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, 0);
 	result = curl_easy_perform(curl);	
 	printf("\n");
+	if(strlen(error_buffer)>0)
+	{
+		log(0,"curl","%s",error_buffer);
+		free(error_buffer);
+		bye(8);	
+	}
 	log(0,"Download","Download completed");
 	curl_easy_cleanup(curl);
+		free(error_buffer);
 	fclose(fp);
 }
 
-void print_help(char *exename)
+void print_help(string exename)
 {
-	#ifdef WIN32
-		char *usage = (char *) malloc((strlen(exename) + 300) * sizeof(char));
-		sprintf(usage, "Call this program from command prompt with this syntax:\n %s <youtube link>\n",exename);
-		MessageBox(0,usage,"Usage",MB_OK);
-		free(usage);
-	#else
-		printf("Usage: %s <youtube link>\n",exename);
-	#endif		
+		string realname = get_only_file_name(exename);
+		
+		
+		char *usage = (char *) malloc((exename.length() + 300) * sizeof(char));
+		sprintf(usage,	"Usage: \n %s [<options>] <youtube link>\n"
+						"    -a  --auto-quality\t\tDownload at highest quality available\n"
+						"    -d  --download-dir <dir>\tDownload file in this directory\n"
+						"    -h  --help\t\t\tPrint this help\n"
+						"\n"
+		,realname.c_str());	
+
+	printf("%s",usage);
+	system("pause");
+	free(usage);		
 }
 
 int main(int argc, char *argv[])
 {
 	print_logo();
     string url,video_id,info_page;
+    
     if(argc<2)
     {
 		print_help(argv[0]);
-		bye(1);	
+		bye(0);	
 	}
 	
-    video_id = get_video_id(argv[1]);
+	int c = 1;
+	bool ok = false;
+    while(c < argc)
+    {
+		ok = false;
+		if((strcmp(argv[c],"--auto-quality") == 0) || (strcmp(argv[c],"-a") == 0))
+		{
+			autoquality = true;
+			ok = true;
+		}
+		
+		if((strcmp(argv[c],"--download-dir") == 0) || (strcmp(argv[c],"-d") == 0))
+		{
+			if(++c <= (argc - 1))
+				download_dir = argv[c];
+			else
+			{
+				log(0,"Engine","Error: %s option requires an input argument",argv[--c]);
+				bye(1);
+			}
+			ok = true;
+		}
+		
+		if((strcmp(argv[c],"--help") == 0) || (strcmp(argv[c],"-h") == 0))
+		{
+			print_help(argv[0]);
+			bye(0);
+			ok = true;
+		}
+		
+		if(ok == false)
+		{
+			if(c == (argc - 1))
+			{
+				url.append(argv[c]);
+			}
+			else
+			{
+				log(0,"Engine","Error: unrecognized command %s",argv[c]);
+				bye(1);
+			}
+		}
+		c++;
+	}
+	
+	if(url.length()==0)
+	{
+        log(0,"Engine","Youtube link not found");
+        bye(2);
+	}
+	
+    video_id = get_video_id(url);
     if(video_id.length()==0)
     {
-        log(0,"Engine","Url isn't valid");
+        log(0,"Engine","Youtube link isn't valid");
         bye(2);
     }
     
@@ -304,7 +421,6 @@ int main(int argc, char *argv[])
 	}
 	
 	print_choose();
-	
 	download_video(video_id,token);
 	bye(0);	
     return 0;
