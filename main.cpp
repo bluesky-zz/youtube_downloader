@@ -61,13 +61,15 @@ void print_choose()
 	else
 	{
 		bool ok = true;
+		char temp_choose[30];
 		do
 		{
 			if(ok == false)
 				log(0, "FormatManager", "Wrong Format!");
 				
 			printf("Choose download format: ");
-			scanf("%d",&format_choosed);
+			fgets(temp_choose,25,stdin);
+			sscanf(temp_choose,"%d",&format_choosed);
 			format_choosed--;
 			
 			ok = false;
@@ -347,8 +349,8 @@ int main(int argc, char *argv[])
 	
 	int c = 1;
 	bool ok = false;
-    while(c < argc)
-    {
+	while(c < argc)
+	{
 		ok = false;
 		if((strcmp(argv[c],"--auto-quality") == 0) || (strcmp(argv[c],"-a") == 0))
 		{
@@ -392,18 +394,18 @@ int main(int argc, char *argv[])
 	
 	if(url.length()==0)
 	{
-        log(0,"Engine","Youtube link not found");
-        bye(2);
+		log(0,"Engine","Youtube link not found");
+		bye(2);
 	}
 	
-    video_id = get_video_id(url);
-    if(video_id.length()==0)
-    {
-        log(0,"Engine","Youtube link isn't valid");
-        bye(2);
-    }
+	video_id = get_video_id(url);
+	if(video_id.length()==0)
+	{
+		log(0,"Engine","Youtube link isn't valid");
+		bye(2);
+	}
     
-    info_page = get_info_page(video_id);
+	info_page = get_info_page(video_id);
 	
 	log(0,"Engine","Getting info");
 	get_info(info_page);
@@ -418,5 +420,5 @@ int main(int argc, char *argv[])
 	print_choose();
 	download_video(video_id,token);
 	bye(0);	
-    return 0;
+	return 0;
 }

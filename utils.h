@@ -18,7 +18,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 	#include "common.h"
-	void log(int no_nl, char *name, const char * str, ... );
+	void log(int no_nl,const char *name, const char * str, ... );
 	void bye(int ret);
 	int strpos(char *haystack, char *needle );
 	string url_decode (string url);

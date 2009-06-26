@@ -39,7 +39,7 @@ unsigned long get_ms_time()
     return time_in_ms;
 }
 
-void log(int no_nl, char *name, const char * str, ... )
+void log(int no_nl,const char *name, const char * str, ... )
 {
 	va_list ap;
 	char buf[32768];
