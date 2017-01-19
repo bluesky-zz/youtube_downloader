@@ -42,7 +42,7 @@ unsigned long get_ms_time()
 void log(int no_nl,const char *name, const char * str, ... )
 {
 	va_list ap;
-	char buf[32768];
+	
     printf("[%s] ",name);
 	va_start(ap, str);
 	vprintf(str, ap);
@@ -118,7 +118,7 @@ string delete_strange_characters(string data)
 string get_file_name(string download_dir, string video_name, bool append_random)
 {
 	string ret;
-	char pos;
+	
 	char strange_char[] = "?\\/*<>\"|:#+%";
 	char rnd[300];
 	
